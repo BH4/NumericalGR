@@ -52,7 +52,7 @@ def RK4(t_0, y_0, f, h=1.0E-3):
 # May not use constant time steps.
 def initialValueSolution(t_0, y_0, f, stop):
     t = t_0
-    y = y_0
+    y = np.array(y_0).astype(float)
 
     h = 1.0E-3
 
@@ -71,12 +71,9 @@ def initialValueSolution(t_0, y_0, f, stop):
 
 if __name__ == '__main__':
     t = 0
-    y = np.array([27.5, -5.3])
-    f = lambda t, y: np.array([y[1], 9.8])
+    y = np.array([0, 1])
+    f = lambda t, y: np.array([np.cos(t), -1*np.sin(t)])
 
-    tvals, yvals = initialValueSolution(t, y, f, lambda t, y: t > 10)
-    print(tvals[-1])
-    print(yvals[-1])
+    tvals, yvals = initialValueSolution(t, y, f, lambda t, y: t > 100)
 
-    plt.plot(tvals, yvals[:, 0])
-    plt.show()
+    print(max(abs(np.sin(tvals) - yvals[:, 0])))

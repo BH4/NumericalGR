@@ -114,7 +114,7 @@ def compute_geodesic(t_0, y_0, stop):
             secondDeriv = 0
             for alpha in range(d):
                 for nu in range(d):
-                    secondDeriv += -1*csymbols[i][alpha][nu]*y[2*alpha]*y[2*nu]
+                    secondDeriv += -1*csymbols[i][alpha][nu]*y[2*alpha+1]*y[2*nu+1]
 
             f.append(secondDeriv)
 
@@ -148,11 +148,25 @@ if __name__ == "__main__":
     plt.xlim(-np.pi, np.pi)
     plt.ylim(np.pi/2, 3*np.pi/2)
     plt.show()
-
-    tvals, yvals = compute_geodesic(0, [np.pi/2, 0, 0, 1], lambda t, y: y[2] > 2*np.pi)
-    plt.plot(yvals[:, 2], yvals[:, 0])
-    plt.xlim(0, 2*np.pi)
-    plt.ylim(0, np.pi)
-    plt.show()
     """
-    print(compute_christoffel(np.pi/2, 0))
+    tvals, yvals = compute_geodesic(0, [.1, 0, 0, 1], lambda t, y: t>100 or y[2] > 2*np.pi)
+    plt.plot(yvals[:, 2], yvals[:, 0])
+    #plt.xlim(0, 2*np.pi)
+    #plt.ylim(0, np.pi)
+    plt.show()
+    
+    """
+    error1 = []
+    error2 = []
+    error3 = []
+    for i in np.linspace(np.pi-1, np.pi+1, 1000):
+        csymbols = compute_christoffel(i, 542165)
+
+        error1.append(np.cos(i)/np.sin(i) - csymbols[1][1][0])
+        error2.append(np.cos(i)/np.sin(i) - csymbols[1][0][1])
+        error3.append(-np.sin(i)*np.cos(i) - csymbols[0][1][1])
+
+    print(max(abs(np.array(error1))))
+    print(max(abs(np.array(error2))))
+    print(max(abs(np.array(error3))))
+    """
