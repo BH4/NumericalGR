@@ -3,13 +3,37 @@ import matplotlib.pyplot as plt
 from numericalMethods import derivative, initialValueSolution
 
 # define the global values which are used in the metric
+
+"""
+# 2 Sphere surface
 global r
 r = 1
 
 
 def metric(theta, phi):
     return np.array([[r**2, 0], [0, r**2*np.sin(theta)**2]])
+"""
 
+# Schwarzschild with G = c = 1
+global rs
+rs = 2.0
+
+
+def metric(t, r, theta, phi):
+    return np.diag([1-rs/r, -1/(1-rs/r), -r**2, -r**2*np.sin(theta)**2])
+
+"""
+# Schwarzschild metric with Gullstrand–Painlevé coordinates with G = c = 1
+global rs
+rs = 2
+
+
+def metric(t, r, theta, phi):
+    m = np.diag([1-rs/r, -1, -r**2, -r**2*np.sin(theta)**2])
+    m[0][1] = -1*np.sqrt(rs/r)
+    m[1][0] = -1*np.sqrt(rs/r)
+    return m
+"""
 
 def compute_christoffel(*args):
     d = len(args)  # number of dimensions
@@ -99,13 +123,13 @@ def compute_ricciscalar(*args):
 
 # y should be a vector corresponding to each coordinate with its derivative
 # following (x, dx, y, dy, ...)
-def compute_geodesic(t_0, y_0, stop):
+def compute_geodesic(s_0, y_0, stop):
     assert len(y_0) % 2 == 0
     d = len(y_0)//2
 
     y_0 = np.array(y_0).astype(float)
 
-    def dydt(t, y):
+    def dyds(s, y):
         csymbols = compute_christoffel(*y[::2])
         f = []
         for i in range(d):
@@ -120,20 +144,22 @@ def compute_geodesic(t_0, y_0, stop):
 
         return np.array(f)
 
-    return initialValueSolution(t_0, y_0, dydt, stop)
+    return initialValueSolution(s_0, y_0, dyds, stop)
 
 
 if __name__ == "__main__":
+    t = 0
+    r = 5
     theta = np.pi/5
     phi = 0
+    args = [t, r, theta, phi]
     """
-    csymbols = compute_christoffel(theta, phi)
-    print(csymbols)
+    print(compute_christoffel(*args))
+    print(compute_riemann_christoffel(*args))
+    print(compute_riccitensor(*args))
+    print(compute_ricciscalar(*args))
     """
-    """
-    riemann = compute_riemann_christoffel(theta, phi)
-    print(riemann)
-    """
+
     """
     for i in range(5):
         r = 2**i
@@ -149,12 +175,13 @@ if __name__ == "__main__":
     plt.ylim(np.pi/2, 3*np.pi/2)
     plt.show()
     """
-    tvals, yvals = compute_geodesic(0, [.1, 0, 0, 1], lambda t, y: t>100 or y[2] > 2*np.pi)
+    """
+    tvals, yvals = compute_geodesic(0, [.00001, 0, 0, 1], lambda t, y: y[2] > 2*np.pi)
     plt.plot(yvals[:, 2], yvals[:, 0])
     #plt.xlim(0, 2*np.pi)
     #plt.ylim(0, np.pi)
     plt.show()
-    
+    """
     """
     error1 = []
     error2 = []
@@ -169,4 +196,16 @@ if __name__ == "__main__":
     print(max(abs(np.array(error1))))
     print(max(abs(np.array(error2))))
     print(max(abs(np.array(error3))))
+    """
+
+    # Schwarschild coordinates orbit BH
+    tvals, yvals = compute_geodesic(0, [0, 1, 5, -.5, np.pi/2, 0, 0, .140275], lambda s, y: y[2] < 1.1*rs or y[2] > 10)
+    plt.polar(yvals[:, 6], yvals[:, 2])
+    plt.show()
+
+    """
+    # GP coordinates falling into BH
+    tvals, yvals = compute_geodesic(0, [0, 0, 3, -.01, np.pi/2, 0, 0, .00981], lambda s, y: y[2] < 0.1*rs or y[2] > 10)
+    plt.polar(yvals[:, 6], yvals[:, 2])
+    plt.show()
     """
