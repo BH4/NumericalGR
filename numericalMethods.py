@@ -50,11 +50,10 @@ def RK4(t_0, y_0, f, h=1.0E-3):
 # Given initial value problem returns the value of y evolved from times t_0
 # until stop(t, y) return True.
 # Uses adaptive time steps (Taken from Wikipedia page on adaptive step size)
-def initialValueSolution(t_0, y_0, f, stop):
+def initialValueSolution(t_0, y_0, f, stop, tol=1.0E-5):
     t = t_0
     y = np.array(y_0).astype(float)
 
-    tol = 1.0E-5
     h = 1.0E-2
 
     tvals = [t]
@@ -86,10 +85,4 @@ def initialValueSolution(t_0, y_0, f, stop):
 
 
 if __name__ == '__main__':
-    t = 0
-    y = np.array([0, 1])
-    f = lambda t, y: np.array([np.cos(t), -1*np.sin(t)])
-
-    tvals, yvals = initialValueSolution(t, y, f, lambda t, y: t > 100)
-
-    print(max(abs(np.sin(tvals) - yvals[:, 0])))
+    testDeriv(np.sin, np.cos, 0, np.pi/3)

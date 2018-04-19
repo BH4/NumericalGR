@@ -2,38 +2,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numericalMethods import derivative, initialValueSolution
 
-# define the global values which are used in the metric
-
-"""
-# 2 Sphere surface
+# define the global values which are used in any metric
 global r
-r = 1
-
-
-def metric(theta, phi):
-    return np.array([[r**2, 0], [0, r**2*np.sin(theta)**2]])
-"""
-
-# Schwarzschild with G = c = 1
 global rs
+r = 1.0
 rs = 2.0
 
 
-def metric(t, r, theta, phi):
-    return np.diag([1-rs/r, -1/(1-rs/r), -r**2, -r**2*np.sin(theta)**2])
+# 2 Sphere surface
+def metric2Sphere(theta, phi):
+    return np.array([[r**2, 0], [0, r**2*np.sin(theta)**2]])
 
-"""
+
+# Schwarzschild with G = c = 1
+def metricSchwarzschild(t, rad, theta, phi):
+    return np.diag([1-rs/rad, -1/(1-rs/rad), -rad**2, -rad**2*np.sin(theta)**2])
+
+
 # Schwarzschild metric with Gullstrand–Painlevé coordinates with G = c = 1
-global rs
-rs = 2
-
-
-def metric(t, r, theta, phi):
-    m = np.diag([1-rs/r, -1, -r**2, -r**2*np.sin(theta)**2])
-    m[0][1] = -1*np.sqrt(rs/r)
-    m[1][0] = -1*np.sqrt(rs/r)
+def metricSGP(t, rad, theta, phi):
+    m = np.diag([1-rs/rad, -1, -rad**2, -rad**2*np.sin(theta)**2])
+    m[0][1] = -1*np.sqrt(rs/rad)
+    m[1][0] = -1*np.sqrt(rs/rad)
     return m
-"""
+
+
+global metric
+metric = metric2Sphere
+
 
 def compute_christoffel(*args):
     d = len(args)  # number of dimensions
@@ -175,34 +171,19 @@ if __name__ == "__main__":
     plt.ylim(np.pi/2, 3*np.pi/2)
     plt.show()
     """
-    """
+
     tvals, yvals = compute_geodesic(0, [.00001, 0, 0, 1], lambda t, y: y[2] > 2*np.pi)
     plt.plot(yvals[:, 2], yvals[:, 0])
     #plt.xlim(0, 2*np.pi)
     #plt.ylim(0, np.pi)
     plt.show()
-    """
-    """
-    error1 = []
-    error2 = []
-    error3 = []
-    for i in np.linspace(np.pi-1, np.pi+1, 1000):
-        csymbols = compute_christoffel(i, 542165)
 
-        error1.append(np.cos(i)/np.sin(i) - csymbols[1][1][0])
-        error2.append(np.cos(i)/np.sin(i) - csymbols[1][0][1])
-        error3.append(-np.sin(i)*np.cos(i) - csymbols[0][1][1])
-
-    print(max(abs(np.array(error1))))
-    print(max(abs(np.array(error2))))
-    print(max(abs(np.array(error3))))
     """
-
     # Schwarschild coordinates orbit BH
     tvals, yvals = compute_geodesic(0, [0, 1, 5, -.5, np.pi/2, 0, 0, .140275], lambda s, y: y[2] < 1.1*rs or y[2] > 10)
     plt.polar(yvals[:, 6], yvals[:, 2])
     plt.show()
-
+    """
     """
     # GP coordinates falling into BH
     tvals, yvals = compute_geodesic(0, [0, 0, 3, -.01, np.pi/2, 0, 0, .00981], lambda s, y: y[2] < 0.1*rs or y[2] > 10)
