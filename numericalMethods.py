@@ -2,6 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+# Uses central difference with 4 points.
+# I know the error (truncation and machine precision) is bounded by
+# M*h^4/30+4*MachineEpsilon/h where M is the magnitude bound on the 5th derivative of f
+# This implies the best h value should be h=(30*MachineEpsilon/M)^(1/5)
+# However without a good idea of what M actually is I can't use this.
+# If M=1 this corresponds to about 10^-3.
 def derivative(f, comp, *args, h=1.0E-3):
     coef = [-1.0/12, 2.0/3, 0, -2.0/3, 1.0/12]
 
@@ -21,9 +27,19 @@ def testDeriv(f, df, comp, *args):
     hvals = np.logspace(-12, 0, 1000)
 
     diff = []
+    minDiff = 10**5
+    bestH = 0
     for h in hvals:
         numDf = derivative(f, comp, *args, h=h)
-        diff.append(abs(df(*args) - numDf))
+        currDiff = abs(df(*args) - numDf)
+        diff.append(currDiff)
+
+        if currDiff < minDiff:
+            minDiff = currDiff
+            bestH = h
+
+    print(bestH)
+    print(minDiff)
 
     plt.loglog(hvals, diff)
     plt.show()
@@ -85,4 +101,12 @@ def initialValueSolution(t_0, y_0, f, stop, tol=1.0E-5):
 
 
 if __name__ == '__main__':
-    testDeriv(np.sin, np.cos, 0, np.pi/3)
+    val = .001
+    M = 120/val**6
+
+    machineEpsilon = np.finfo(float).eps
+    h = (30*machineEpsilon/M)**(1.0/5)
+    print("assumed h")
+    print(h)
+    print("real vals")
+    testDeriv(lambda x: 1/x, lambda x: -1/x**2, 0, val)

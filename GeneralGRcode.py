@@ -9,6 +9,10 @@ r = 1.0
 rs = 2.0
 
 
+def metricPolar(rad, theta):
+    return np.array([[1, 0], [0, rad**2]])
+
+
 # 2 Sphere surface
 def metric2Sphere(theta, phi):
     return np.array([[r**2, 0], [0, r**2*np.sin(theta)**2]])
@@ -28,7 +32,7 @@ def metricSGP(t, rad, theta, phi):
 
 
 global metric
-metric = metric2Sphere
+metric = metricSchwarzschild
 
 
 def compute_christoffel(*args):
@@ -36,7 +40,7 @@ def compute_christoffel(*args):
 
     csymbols = np.zeros((d, d, d))  # first index is the upper index
 
-    dg = []
+    dg = []  # First index is the derivative!
     for i in range(d):
         dg.append(derivative(metric, i, *args))
 
@@ -62,7 +66,7 @@ def compute_riemann_christoffel(*args):
 
     gamma = compute_christoffel
     gammaEval = gamma(*args)
-    dgamma = []
+    dgamma = []  # First index is the derivative!
     for i in range(d):
         dgamma.append(derivative(gamma, i, *args))
 
@@ -117,9 +121,26 @@ def compute_ricciscalar(*args):
     return ricciscalar
 
 
+# y should be an array with each coordinate value followed directly by its
+# derivative with respect to s. This function is intended to be used to test
+# if a particular set of coordinates and derivatives corresponds to a null
+# geodesic.
+def nullTest(y):
+    assert len(y) % 2 == 0
+    d = len(y)//2  # number of dimensions
+    g = metric(*y[::2])
+
+    tot = 0
+    for mu in range(d):
+        for nu in range(d):
+            tot += g[mu][nu]*y[2*mu+1]*y[2*nu+1]
+
+    return tot
+
+
 # y should be a vector corresponding to each coordinate with its derivative
 # following (x, dx, y, dy, ...)
-def compute_geodesic(s_0, y_0, stop):
+def compute_geodesic(s_0, y_0, stop, tol=1.0E-5):
     assert len(y_0) % 2 == 0
     d = len(y_0)//2
 
@@ -140,15 +161,17 @@ def compute_geodesic(s_0, y_0, stop):
 
         return np.array(f)
 
-    return initialValueSolution(s_0, y_0, dyds, stop)
+    return initialValueSolution(s_0, y_0, dyds, stop, tol=tol)
 
 
 if __name__ == "__main__":
+    """
     t = 0
     r = 5
     theta = np.pi/5
     phi = 0
     args = [t, r, theta, phi]
+    """
     """
     print(compute_christoffel(*args))
     print(compute_riemann_christoffel(*args))
@@ -171,19 +194,30 @@ if __name__ == "__main__":
     plt.ylim(np.pi/2, 3*np.pi/2)
     plt.show()
     """
-
+    """
     tvals, yvals = compute_geodesic(0, [.00001, 0, 0, 1], lambda t, y: y[2] > 2*np.pi)
     plt.plot(yvals[:, 2], yvals[:, 0])
     #plt.xlim(0, 2*np.pi)
     #plt.ylim(0, np.pi)
     plt.show()
+    """
+    args = (0, 3, np.pi/2, 0)
+    g = metric(*args)
+    # value of dt/ds = sqrt(-(g[i][i]*vel[i])/g[0][0]) for i=1,2,3,... for a DIAGONAL metric
+    dtds = np.sqrt(-(g[3][3])/g[0][0])
+    y_0 = [args[0], dtds, args[1], 0, args[2], 0, args[3], 1]
+    print(nullTest(y_0))
 
-    """
-    # Schwarschild coordinates orbit BH
-    tvals, yvals = compute_geodesic(0, [0, 1, 5, -.5, np.pi/2, 0, 0, .140275], lambda s, y: y[2] < 1.1*rs or y[2] > 10)
-    plt.polar(yvals[:, 6], yvals[:, 2])
+    # Schwarschild coordinates photosphere
+    tvals, yvals = compute_geodesic(0, y_0, lambda s, y: s>100 or y[2] < 1.1*rs or y[2] > 10, tol=1.0E-10)
+    print(nullTest(yvals[len(yvals)//2]))
+    print(nullTest(yvals[-1]))
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='polar')
+    c = ax.scatter(yvals[:, 6], yvals[:, 2])
+    #plt.polar(yvals[:, 6], yvals[:, 2])
     plt.show()
-    """
+
     """
     # GP coordinates falling into BH
     tvals, yvals = compute_geodesic(0, [0, 0, 3, -.01, np.pi/2, 0, 0, .00981], lambda s, y: y[2] < 0.1*rs or y[2] > 10)
