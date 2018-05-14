@@ -140,6 +140,8 @@ def nullTest(y):
 
 # y should be a vector corresponding to each coordinate with its derivative
 # following (x, dx, y, dy, ...)
+# stop is a functions taking in s, y, N which returns true when a stop condition is met.
+# N is the number of steps taken.
 def compute_geodesic(s_0, y_0, stop, tol=1.0E-5):
     assert len(y_0) % 2 == 0
     d = len(y_0)//2
@@ -164,43 +166,22 @@ def compute_geodesic(s_0, y_0, stop, tol=1.0E-5):
     return initialValueSolution(s_0, y_0, dyds, stop, tol=tol)
 
 
+# wrapper for compute_geodesic
+def compute_null_geodesic(s_0, y_0, stop, tol=1.0E-5):
+    assert nullTest(y_0) < 10**-10
+
+    nullCheck = 1
+    while nullCheck > 10**-10:
+        tvals, yvals, numStepsTaken = compute_geodesic(s_0, y_0, stop, tol=tol)
+
+        nullCheck = nullTest(yvals[-1])
+        tol /= 10
+
+    return tvals, yvals, numStepsTaken
+
+
 if __name__ == "__main__":
-    """
-    t = 0
-    r = 5
-    theta = np.pi/5
-    phi = 0
-    args = [t, r, theta, phi]
-    """
-    """
-    print(compute_christoffel(*args))
-    print(compute_riemann_christoffel(*args))
-    print(compute_riccitensor(*args))
-    print(compute_ricciscalar(*args))
-    """
-
-    """
-    for i in range(5):
-        r = 2**i
-        plt.scatter(1.0/r**2, compute_ricciscalar(np.pi/2, 0))
-
-    plt.ylim(-3, 1)
-    plt.show()
-    """
-    """
-    tvals, yvals = compute_geodesic(0, [np.pi/2, 1, 0, 0], lambda t, y: y[0] > 3*np.pi/2)
-    plt.plot(yvals[:, 2], yvals[:, 0])
-    plt.xlim(-np.pi, np.pi)
-    plt.ylim(np.pi/2, 3*np.pi/2)
-    plt.show()
-    """
-    """
-    tvals, yvals = compute_geodesic(0, [.00001, 0, 0, 1], lambda t, y: y[2] > 2*np.pi)
-    plt.plot(yvals[:, 2], yvals[:, 0])
-    #plt.xlim(0, 2*np.pi)
-    #plt.ylim(0, np.pi)
-    plt.show()
-    """
+    
     args = (0, 3, np.pi/2, 0)
     g = metric(*args)
     # value of dt/ds = sqrt(-(g[i][i]*vel[i])/g[0][0]) for i=1,2,3,... for a DIAGONAL metric
@@ -209,18 +190,11 @@ if __name__ == "__main__":
     print(nullTest(y_0))
 
     # Schwarschild coordinates photosphere
-    tvals, yvals = compute_geodesic(0, y_0, lambda s, y: s>100 or y[2] < 1.1*rs or y[2] > 10, tol=1.0E-10)
+    tvals, yvals = compute_geodesic(0, y_0, lambda s, y, N: s > 50 or y[2] < 1.1*rs or y[2] > 10, tol=1.0E-10)
     print(nullTest(yvals[len(yvals)//2]))
     print(nullTest(yvals[-1]))
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='polar')
-    c = ax.scatter(yvals[:, 6], yvals[:, 2])
-    #plt.polar(yvals[:, 6], yvals[:, 2])
-    plt.show()
-
-    """
-    # GP coordinates falling into BH
-    tvals, yvals = compute_geodesic(0, [0, 0, 3, -.01, np.pi/2, 0, 0, .00981], lambda s, y: y[2] < 0.1*rs or y[2] > 10)
+    #fig = plt.figure()
+    #ax = fig.add_subplot(111, projection='polar')
+    #c = ax.scatter(yvals[:, 6], yvals[:, 2])
     plt.polar(yvals[:, 6], yvals[:, 2])
     plt.show()
-    """

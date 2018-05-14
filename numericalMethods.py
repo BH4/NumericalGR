@@ -74,7 +74,8 @@ def initialValueSolution(t_0, y_0, f, stop, tol=1.0E-5):
 
     tvals = [t]
     yvals = [y]
-    while not stop(t, y):
+    numStepsTaken = 0
+    while not stop(t, y, numStepsTaken):
         tFull, yFull = RK4(t, y, f, h=h)
         tHalf, yHalf = RK4(t, y, f, h=h/2.0)
         tHalf, yHalf = RK4(tHalf, yHalf, f, h=h/2.0)
@@ -86,8 +87,10 @@ def initialValueSolution(t_0, y_0, f, stop, tol=1.0E-5):
             t = tFull
             y = yFull
 
+            numStepsTaken += 1
+
         if error == 0:
-            print("0 error?")
+            # print("0 error?")
             h *= 2
         else:
             # .9 is safety factor to make sure we get desired accuracy,
@@ -97,7 +100,7 @@ def initialValueSolution(t_0, y_0, f, stop, tol=1.0E-5):
     tvals = np.array(tvals)
     yvals = np.array(yvals)
 
-    return tvals, yvals
+    return tvals, yvals, numStepsTaken
 
 
 if __name__ == '__main__':
