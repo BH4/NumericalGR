@@ -171,17 +171,32 @@ def compute_null_geodesic(s_0, y_0, stop, tol=1.0E-5):
     assert abs(velocityMagnitude(y_0)) < 10**-10
 
     nullCheck = 1
-    while nullCheck > 10**-10:
+    while nullCheck > 10**-2:
         tvals, yvals, numStepsTaken = compute_geodesic(s_0, y_0, stop, tol=tol)
 
         nullCheck = abs(velocityMagnitude(yvals[-1]))
         tol /= 10
 
-    return tvals, yvals, numStepsTaken
+    return tvals, yvals
+
+
+# wrapper for compute_geodesic
+def compute_timelike_geodesic(s_0, y_0, stop, tol=1.0E-5):
+    v = 1
+    assert v-10**-10 < velocityMagnitude(y_0) < v+10**-10
+
+    nullCheck = 1
+    while not Check:
+        tvals, yvals, numStepsTaken = compute_geodesic(s_0, y_0, stop, tol=tol)
+
+        Check = v-10**-2 < velocityMagnitude(yvals[-1]) < v+10**-2
+        tol /= 10
+
+    return tvals, yvals
 
 
 if __name__ == "__main__":
-    
+
     args = (0, 3, np.pi/2, 0)
     g = metric(*args)
     # value of dt/ds = sqrt(-(g[i][i]*vel[i])/g[0][0]) for i=1,2,3,... for a DIAGONAL metric

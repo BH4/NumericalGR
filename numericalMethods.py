@@ -100,7 +100,7 @@ def initialValueSolution(t_0, y_0, f, stop, tol=1.0E-5):
     tvals = np.array(tvals)
     yvals = np.array(yvals)
 
-    return tvals, yvals, numStepsTaken
+    return tvals, yvals
 
 
 if __name__ == '__main__':
