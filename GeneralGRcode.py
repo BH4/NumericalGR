@@ -122,10 +122,10 @@ def compute_ricciscalar(*args):
 
 
 # y should be an array with each coordinate value followed directly by its
-# derivative with respect to s. This function is intended to be used to test
-# if a particular set of coordinates and derivatives corresponds to a null
-# geodesic.
-def nullTest(y):
+# derivative with respect to s. This function is intended to be used to
+# calculate the magnitude of a velocity vector at a given point. This is useful
+# for testing if a velocity vector is null for example.
+def velocityMagnitude(y):
     assert len(y) % 2 == 0
     d = len(y)//2  # number of dimensions
     g = metric(*y[::2])
@@ -168,13 +168,13 @@ def compute_geodesic(s_0, y_0, stop, tol=1.0E-5):
 
 # wrapper for compute_geodesic
 def compute_null_geodesic(s_0, y_0, stop, tol=1.0E-5):
-    assert abs(nullTest(y_0)) < 10**-10
+    assert abs(velocityMagnitude(y_0)) < 10**-10
 
     nullCheck = 1
     while nullCheck > 10**-10:
         tvals, yvals, numStepsTaken = compute_geodesic(s_0, y_0, stop, tol=tol)
 
-        nullCheck = abs(nullTest(yvals[-1]))
+        nullCheck = abs(velocityMagnitude(yvals[-1]))
         tol /= 10
 
     return tvals, yvals, numStepsTaken
@@ -187,12 +187,12 @@ if __name__ == "__main__":
     # value of dt/ds = sqrt(-(g[i][i]*vel[i])/g[0][0]) for i=1,2,3,... for a DIAGONAL metric
     dtds = np.sqrt(-(g[3][3])/g[0][0])
     y_0 = [args[0], dtds, args[1], 0, args[2], 0, args[3], 1]
-    print(nullTest(y_0))
+    print(velocityMagnitude(y_0))
 
     # Schwarschild coordinates photosphere
     tvals, yvals = compute_geodesic(0, y_0, lambda s, y, N: s > 50 or y[2] < 1.1*rs or y[2] > 10, tol=1.0E-10)
-    print(nullTest(yvals[len(yvals)//2]))
-    print(nullTest(yvals[-1]))
+    print(velocityMagnitude(yvals[len(yvals)//2]))
+    print(velocityMagnitude(yvals[-1]))
     #fig = plt.figure()
     #ax = fig.add_subplot(111, projection='polar')
     #c = ax.scatter(yvals[:, 6], yvals[:, 2])
