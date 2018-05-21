@@ -168,13 +168,13 @@ def compute_geodesic(s_0, y_0, stop, tol=1.0E-5):
 
 # wrapper for compute_geodesic
 def compute_null_geodesic(s_0, y_0, stop, tol=1.0E-5):
-    assert nullTest(y_0) < 10**-10
+    assert abs(nullTest(y_0)) < 10**-10
 
     nullCheck = 1
     while nullCheck > 10**-10:
         tvals, yvals, numStepsTaken = compute_geodesic(s_0, y_0, stop, tol=tol)
 
-        nullCheck = nullTest(yvals[-1])
+        nullCheck = abs(nullTest(yvals[-1]))
         tol /= 10
 
     return tvals, yvals, numStepsTaken
