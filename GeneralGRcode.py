@@ -135,7 +135,7 @@ def nullTest(y):
         for nu in range(d):
             tot += g[mu][nu]*y[2*mu+1]*y[2*nu+1]
 
-    return abs(tot)
+    return tot
 
 
 # y should be a vector corresponding to each coordinate with its derivative
@@ -168,13 +168,13 @@ def compute_geodesic(s_0, y_0, stop, tol=1.0E-5):
 
 # wrapper for compute_geodesic
 def compute_null_geodesic(s_0, y_0, stop, tol=1.0E-5):
-    assert nullTest(y_0) < 10**-5
+    assert abs(nullTest(y_0)) < 10**-10
 
     nullCheck = 1
-    while nullCheck > 10**-5:
+    while nullCheck > 10**-10:
         tvals, yvals, numStepsTaken = compute_geodesic(s_0, y_0, stop, tol=tol)
 
-        nullCheck = nullTest(yvals[-1])
+        nullCheck = abs(nullTest(yvals[-1]))
         tol /= 10
 
     return tvals, yvals, numStepsTaken
