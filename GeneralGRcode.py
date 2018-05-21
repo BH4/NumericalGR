@@ -172,7 +172,7 @@ def compute_null_geodesic(s_0, y_0, stop, tol=1.0E-5):
 
     nullCheck = 1
     while nullCheck > 10**-2:
-        tvals, yvals, numStepsTaken = compute_geodesic(s_0, y_0, stop, tol=tol)
+        tvals, yvals = compute_geodesic(s_0, y_0, stop, tol=tol)
 
         nullCheck = abs(velocityMagnitude(yvals[-1]))
         tol /= 10
@@ -187,7 +187,7 @@ def compute_timelike_geodesic(s_0, y_0, stop, tol=1.0E-5):
 
     nullCheck = 1
     while not Check:
-        tvals, yvals, numStepsTaken = compute_geodesic(s_0, y_0, stop, tol=tol)
+        tvals, yvals = compute_geodesic(s_0, y_0, stop, tol=tol)
 
         Check = v-10**-2 < velocityMagnitude(yvals[-1]) < v+10**-2
         tol /= 10
