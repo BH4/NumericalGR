@@ -5,8 +5,10 @@ from numericalMethods import derivative, initialValueSolution
 # define the global values which are used in any metric
 global r
 global rs
+global a
 r = 1.0
-rs = 2.0
+rs = 2.0  # used in Schwarzchild and Kerr
+a = 1.0  # Kerr metric measure of rotation
 
 
 def metricPolar(rad, theta):
@@ -28,6 +30,16 @@ def metricSGP(t, rad, theta, phi):
     m = np.diag([1-rs/rad, -1, -rad**2, -rad**2*np.sin(theta)**2])
     m[0][1] = -1*np.sqrt(rs/rad)
     m[1][0] = -1*np.sqrt(rs/rad)
+    return m
+
+
+def metricKerr(t, rad, theta, phi):
+    Sigma = rad**2 + a**2*np.cos(theta)**2
+    Delta = rad**2 - rad*rs + a**2
+
+    m = np.diag([1-rs*rad/Sigma, -Sigma/Delta, -Sigma, -(rad**2+a**2+(rs*r*a**2/Sigma)*np.sin(theta)**2)*np.sin(theta)**2])
+    m[0][3] = (rs*rad*a*np.sin(theta)**2)/Sigma
+    m[3][0] = (rs*rad*a*np.sin(theta)**2)/Sigma
     return m
 
 
@@ -185,31 +197,20 @@ def compute_timelike_geodesic(s_0, y_0, stop, tol=1.0E-5):
     v = 1
     assert v-10**-10 < velocityMagnitude(y_0) < v+10**-10
 
-    nullCheck = 1
+    Check = False
     while not Check:
         tvals, yvals = compute_geodesic(s_0, y_0, stop, tol=tol)
 
         Check = v-10**-2 < velocityMagnitude(yvals[-1]) < v+10**-2
         tol /= 10
+        if not Check:
+            print("dang")
 
     return tvals, yvals
 
 
-if __name__ == "__main__":
+def polarToRectangular(rad, phi):
+    x = np.array(rad)*np.cos(phi)
+    y = np.array(rad)*np.sin(phi)
 
-    args = (0, 3, np.pi/2, 0)
-    g = metric(*args)
-    # value of dt/ds = sqrt(-(g[i][i]*vel[i])/g[0][0]) for i=1,2,3,... for a DIAGONAL metric
-    dtds = np.sqrt(-(g[3][3])/g[0][0])
-    y_0 = [args[0], dtds, args[1], 0, args[2], 0, args[3], 1]
-    print(velocityMagnitude(y_0))
-
-    # Schwarschild coordinates photosphere
-    tvals, yvals = compute_geodesic(0, y_0, lambda s, y, N: s > 50 or y[2] < 1.1*rs or y[2] > 10, tol=1.0E-10)
-    print(velocityMagnitude(yvals[len(yvals)//2]))
-    print(velocityMagnitude(yvals[-1]))
-    #fig = plt.figure()
-    #ax = fig.add_subplot(111, projection='polar')
-    #c = ax.scatter(yvals[:, 6], yvals[:, 2])
-    plt.polar(yvals[:, 6], yvals[:, 2])
-    plt.show()
+    return x, y
