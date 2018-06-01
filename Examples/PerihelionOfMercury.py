@@ -19,11 +19,11 @@ import GeneralGRcode as GR
 
 
 if __name__ == "__main__":
-    metric = GR.metricSchwarzschild
+    GR.metric = GR.metricSchwarzschild
     GR.rs = 10**-6
 
     args = (0, 23.64, np.pi/2, 0)
-    g = metric(*args)
+    g = GR.metric(*args)
     y = .000005483
     dtds = np.sqrt((1-g[3][3]*y**2)/g[0][0])
     y_0 = [args[0], dtds, args[1], 0, args[2], 0, args[3], y]

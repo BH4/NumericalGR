@@ -8,6 +8,8 @@ global rs
 global a
 r = 1.0
 rs = 2.0  # used in Schwarzchild and Kerr
+
+# a<rs/2
 a = 1.0  # Kerr metric measure of rotation
 
 
@@ -34,6 +36,7 @@ def metricSGP(t, rad, theta, phi):
 
 
 def metricKerr(t, rad, theta, phi):
+    assert a < rs/2
     Sigma = rad**2 + a**2*np.cos(theta)**2
     Delta = rad**2 - rad*rs + a**2
 
@@ -44,7 +47,7 @@ def metricKerr(t, rad, theta, phi):
 
 
 global metric
-metric = metricSchwarzschild
+metric = None
 
 
 def compute_christoffel(*args):
@@ -194,6 +197,8 @@ def compute_null_geodesic(s_0, y_0, stop, tol=1.0E-5):
 
 # wrapper for compute_geodesic
 def compute_timelike_geodesic(s_0, y_0, stop, tol=1.0E-5):
+    allowedError = .1
+
     v = 1
     assert v-10**-10 < velocityMagnitude(y_0) < v+10**-10
 
@@ -201,7 +206,8 @@ def compute_timelike_geodesic(s_0, y_0, stop, tol=1.0E-5):
     while not Check:
         tvals, yvals = compute_geodesic(s_0, y_0, stop, tol=tol)
 
-        Check = v-10**-2 < velocityMagnitude(yvals[-1]) < v+10**-2
+        velM = velocityMagnitude(yvals[-1])
+        Check = v-allowedError < velM < v+allowedError
         tol /= 10
         if not Check:
             print("dang")
