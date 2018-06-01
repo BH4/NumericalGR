@@ -36,11 +36,13 @@ def SchwarschildLimit():
 
 if __name__ == "__main__":
     GR.metric = GR.metricKerr
+    GR.rs = 3.0
     GR.a = 1.0
 
     args = (0, (10)*GR.rs, np.pi/2, 0)
     y_0 = [args[0], 1, args[1], 0, args[2], 0, args[3], 0]
 
+    tvals, yvals = GR.compute_geodesic(0, y_0, lambda s, y, N: y[2] < 1.1*GR.rs or y[2] > 20*GR.rs, tol=1.0E-10)
 
     rad = yvals[:, 2]
     phi = yvals[:, 6]
