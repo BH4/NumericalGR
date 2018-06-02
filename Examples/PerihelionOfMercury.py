@@ -19,8 +19,8 @@ import GeneralGRcode as GR
 
 
 if __name__ == "__main__":
-    GR.metric = GR.metricSchwarzschild
-    GR.rs = 10**-6
+    rs = 10**-6
+    GR.metric = GR.metricSchwarzschild(rs)
 
     args = (0, 23.64, np.pi/2, 0)
     g = GR.metric(*args)

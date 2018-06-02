@@ -2,49 +2,52 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numericalMethods import derivative, initialValueSolution
 
-# define the global values which are used in any metric
-global r
-global rs
-global a
-r = 1.0
-rs = 2.0  # used in Schwarzchild and Kerr
 
-# a<rs/2
-a = 1.0  # Kerr metric measure of rotation
-
-
-def metricPolar(rad, theta):
-    return np.array([[1, 0], [0, rad**2]])
+def metricPolar():
+    def metricFunc(rad, theta):
+        return np.array([[1, 0], [0, rad**2]])
+    return metricFunc
 
 
 # 2 Sphere surface
-def metric2Sphere(theta, phi):
-    return np.array([[r**2, 0], [0, r**2*np.sin(theta)**2]])
+def metric2Sphere(r):
+    def metricFunc(theta, phi):
+        return np.array([[r**2, 0], [0, r**2*np.sin(theta)**2]])
+    return metricFunc
 
 
 # Schwarzschild with G = c = 1
-def metricSchwarzschild(t, rad, theta, phi):
-    return np.diag([-(1-rs/rad), 1/(1-rs/rad), rad**2, rad**2*np.sin(theta)**2])
+# rs=2m is the Schwarzschild radius
+def metricSchwarzschild(rs):
+    def metricFunc(t, rad, theta, phi):
+        return np.diag([-(1-rs/rad), 1/(1-rs/rad), rad**2, rad**2*np.sin(theta)**2])
+    return metricFunc
 
 
 # Schwarzschild metric with Gullstrand–Painlevé coordinates with G = c = 1
-def metricSGP(t, rad, theta, phi):
-    print("Unsure if metric is correct after trying to switch signature.")
-    m = np.diag([-(1-rs/rad), 1, rad**2, rad**2*np.sin(theta)**2])
-    m[0][1] = 1*np.sqrt(rs/rad)
-    m[1][0] = 1*np.sqrt(rs/rad)
-    return m
+def metricSGP(rs):
+    def metricFunc(t, rad, theta, phi):
+        print("Unsure if metric is correct after trying to switch signature.")
+        m = np.diag([-(1-rs/rad), 1, rad**2, rad**2*np.sin(theta)**2])
+        m[0][1] = 1*np.sqrt(rs/rad)
+        m[1][0] = 1*np.sqrt(rs/rad)
+        return m
+    return metricFunc
 
 
-def metricKerr(t, rad, theta, phi):
-    assert a < rs/2
-    Sigma = rad**2 + a**2*np.cos(theta)**2
-    Delta = rad**2 - rad*rs + a**2
+# a<rs/2
+# a=Kerr metric measure of rotation
+def metricKerr(rs, a):
+    def metricFunc(t, rad, theta, phi):
+        assert a < rs/2
+        Sigma = rad**2 + a**2*np.cos(theta)**2
+        Delta = rad**2 - rad*rs + a**2
 
-    m = np.diag([-(1-rs*rad/Sigma), Sigma/Delta, Sigma, (rad**2+a**2+(rs*r*a**2/Sigma)*np.sin(theta)**2)*np.sin(theta)**2])
-    m[0][3] = -(rs*rad*a*np.sin(theta)**2)/Sigma
-    m[3][0] = -(rs*rad*a*np.sin(theta)**2)/Sigma
-    return m
+        m = np.diag([-(1-rs*rad/Sigma), Sigma/Delta, Sigma, (rad**2+a**2+(rs*rad*a**2/Sigma)*np.sin(theta)**2)*np.sin(theta)**2])
+        m[0][3] = -(rs*rad*a*np.sin(theta)**2)/Sigma
+        m[3][0] = -(rs*rad*a*np.sin(theta)**2)/Sigma
+        return m
+    return metricFunc
 
 
 global metric

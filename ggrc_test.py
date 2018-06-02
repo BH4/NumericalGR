@@ -12,7 +12,7 @@ class TestChristoffel(unittest.TestCase):
         Gamma(0, 1, 1) = -sin(theta)*cos(theta)
         All other Christoffel symbols are zero.
         """
-        GR.metric = GR.metric2Sphere
+        GR.metric = GR.metric2Sphere(1.0)
 
         maxError = 0.0
 
@@ -35,15 +35,15 @@ class TestRicciScalar(unittest.TestCase):
         """
         R = -2/r**2
         """
-        GR.metric = GR.metric2Sphere
 
         for i in np.linspace(.1, 10, 100):
-            GR.r = i
+            GR.metric = GR.metric2Sphere(i)
+            
             # accuracy is lost near the poles.
             for theta in [.25, 1, np.pi-.25]:
                 v = GR.compute_ricciscalar(theta, 0)
 
-            self.assertEqual(round(v, 5), round(2/GR.r**2, 5))
+                self.assertEqual(round(v, 5), round(2/i**2, 5))
 
 
 if __name__ == '__main__':
