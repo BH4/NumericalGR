@@ -60,7 +60,7 @@ class TestInitValueSolver(unittest.TestCase):
         f = lambda t, y: np.array([np.cos(t), -1*np.sin(t)])
         tol = 1.0E-6
 
-        tvals, yvals = initialValueSolution(t, y, f, lambda t, y: t > 100, tol=tol)
+        tvals, yvals = initialValueSolution(t, y, f, lambda t, y, N: t > 100, tol=tol)
 
         maxError = max(abs(np.sin(tvals) - yvals[:, 0]))
 

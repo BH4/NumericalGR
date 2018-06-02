@@ -43,7 +43,7 @@ class TestRicciScalar(unittest.TestCase):
             for theta in [.25, 1, np.pi-.25]:
                 v = GR.compute_ricciscalar(theta, 0)
 
-            self.assertEqual(round(v, 5), round(-2/GR.r**2, 5))
+            self.assertEqual(round(v, 5), round(2/GR.r**2, 5))
 
 
 if __name__ == '__main__':

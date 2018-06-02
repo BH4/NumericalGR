@@ -24,12 +24,12 @@ def metric2Sphere(theta, phi):
 
 # Schwarzschild with G = c = 1
 def metricSchwarzschild(t, rad, theta, phi):
-    return np.diag([1-rs/rad, -1/(1-rs/rad), -rad**2, -rad**2*np.sin(theta)**2])
+    return np.diag([(1-rs/rad), -1/(1-rs/rad), -rad**2, -rad**2*np.sin(theta)**2])
 
 
 # Schwarzschild metric with Gullstrand–Painlevé coordinates with G = c = 1
 def metricSGP(t, rad, theta, phi):
-    m = np.diag([1-rs/rad, -1, -rad**2, -rad**2*np.sin(theta)**2])
+    m = np.diag([(1-rs/rad), -1, -rad**2, -rad**2*np.sin(theta)**2])
     m[0][1] = -1*np.sqrt(rs/rad)
     m[1][0] = -1*np.sqrt(rs/rad)
     return m
@@ -115,7 +115,7 @@ def compute_riccitensor(*args):
         for nu in range(d):
             tot = 0
             for sigma in range(d):
-                tot += riemann[sigma][mu][nu][sigma]
+                tot += riemann[sigma][mu][sigma][nu]
 
             riccitensor[mu][nu] = tot
 
