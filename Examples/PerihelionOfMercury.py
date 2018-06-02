@@ -25,7 +25,7 @@ if __name__ == "__main__":
     args = (0, 23.64, np.pi/2, 0)
     g = GR.metric(*args)
     y = .000005483
-    dtds = np.sqrt((1-g[3][3]*y**2)/g[0][0])
+    dtds = np.sqrt((-1-g[3][3]*y**2)/g[0][0])
     y_0 = [args[0], dtds, args[1], 0, args[2], 0, args[3], y]
     numOrbits = 10
     tvals, yvals = GR.compute_timelike_geodesic(0, y_0, lambda s, y, N: y[6]/(2*np.pi) > numOrbits, tol=1.0E-5)

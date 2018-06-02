@@ -24,14 +24,15 @@ def metric2Sphere(theta, phi):
 
 # Schwarzschild with G = c = 1
 def metricSchwarzschild(t, rad, theta, phi):
-    return np.diag([(1-rs/rad), -1/(1-rs/rad), -rad**2, -rad**2*np.sin(theta)**2])
+    return np.diag([-(1-rs/rad), 1/(1-rs/rad), rad**2, rad**2*np.sin(theta)**2])
 
 
 # Schwarzschild metric with Gullstrand–Painlevé coordinates with G = c = 1
 def metricSGP(t, rad, theta, phi):
-    m = np.diag([(1-rs/rad), -1, -rad**2, -rad**2*np.sin(theta)**2])
-    m[0][1] = -1*np.sqrt(rs/rad)
-    m[1][0] = -1*np.sqrt(rs/rad)
+    print("Unsure if metric is correct after trying to switch signature.")
+    m = np.diag([-(1-rs/rad), 1, rad**2, rad**2*np.sin(theta)**2])
+    m[0][1] = 1*np.sqrt(rs/rad)
+    m[1][0] = 1*np.sqrt(rs/rad)
     return m
 
 
@@ -40,9 +41,9 @@ def metricKerr(t, rad, theta, phi):
     Sigma = rad**2 + a**2*np.cos(theta)**2
     Delta = rad**2 - rad*rs + a**2
 
-    m = np.diag([1-rs*rad/Sigma, -Sigma/Delta, -Sigma, -(rad**2+a**2+(rs*r*a**2/Sigma)*np.sin(theta)**2)*np.sin(theta)**2])
-    m[0][3] = (rs*rad*a*np.sin(theta)**2)/Sigma
-    m[3][0] = (rs*rad*a*np.sin(theta)**2)/Sigma
+    m = np.diag([-(1-rs*rad/Sigma), Sigma/Delta, Sigma, (rad**2+a**2+(rs*r*a**2/Sigma)*np.sin(theta)**2)*np.sin(theta)**2])
+    m[0][3] = -(rs*rad*a*np.sin(theta)**2)/Sigma
+    m[3][0] = -(rs*rad*a*np.sin(theta)**2)/Sigma
     return m
 
 
@@ -199,7 +200,7 @@ def compute_null_geodesic(s_0, y_0, stop, tol=1.0E-5):
 def compute_timelike_geodesic(s_0, y_0, stop, tol=1.0E-5):
     allowedError = .1
 
-    v = 1
+    v = -1
     assert v-10**-10 < velocityMagnitude(y_0) < v+10**-10
 
     Check = False
